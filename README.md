@@ -62,4 +62,4 @@ Estas tem como objetivo acessar diretamente o arquivo para realizar o registros,
 
 # Conclusão
 
-No geral, foi um projeto bom (na minha visão). Aprendi o básico de como lidar com arquivos em C, futuramente pretendo refazer esse mesmo projeto tabela hash (carregando os registros para RAM ao invés de manipula-los em memória secundária) e em C++ utilizando as bibliotecas da linguagem (talvez até com GUI usando GTK ou Qt 😏).
+No geral, foi um projeto bom (na minha visão). Aprendi o básico de como lidar com arquivos em C, futuramente pretendo refazer esse mesmo projeto usando tabela hash (carregando os registros para RAM ao invés de manipula-los em memória secundária) e em C++ utilizando as bibliotecas da linguagem (talvez até com GUI usando GTK ou Qt 😏).
