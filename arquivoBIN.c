@@ -31,8 +31,9 @@ typedef struct individuo
 void initFILE();
 void inserirFILE(ind temp);
 void exibirFILE();
-int buscarDados(const char nome[]);
+int buscarFILE(const char nome[]);
 int excluirFILE(const char nomeExcluir[]);
+int alterarFILE(const char nomeAlterar[]);
 int overwriteFILE(const char nomeArquivoOriginal[], const char nomeArquivoTemp[]);
 
 // ind functions
@@ -61,6 +62,7 @@ void initFILE()
         if ((temp = fopen(FILENAME, APPEND_READ)) == NULL)
         {
             puts("Não foi possível criar o arquivo.");
+            exit(0);
         }
         else
         {
@@ -119,7 +121,7 @@ void exibirFILE()
     }
 }
 
-int buscarDados(const char nome[])
+int buscarFILE(const char nome[])
 {
     ind temp;
     FILE * arquivo;
@@ -204,7 +206,7 @@ int excluirFILE(const char nomeExcluir[])
     }
 }
 
-int alterarDados(const char nomeAlterar[])
+int alterarFILE(const char nomeAlterar[])
 {
     FILE * arquivoTemp;
     FILE * arquivoOriginal;
@@ -243,21 +245,24 @@ int alterarDados(const char nomeAlterar[])
     fclose(arquivoTemp);
     fclose(arquivoOriginal);
 
-    retornoFunctions = overwriteFILE(FILENAME, ALTERARFILENAME);
+    if (found == TRUE)
+    {   
+        // overwritting
+        retornoFunctions = overwriteFILE(FILENAME, ALTERARFILENAME);
 
-    if(found == TRUE && retornoFunctions == FALSE)
-    {
-        return TRUE;
-    }
-    else if (found == FALSE && retornoFunctions == FALSE)
-    {
-        return FALSE;
+        if(retornoFunctions == FALSE)
+        {
+            return TRUE;
+        }
+        else
+        {
+            return ERROR;
+        }
     }
     else
     {
-        return ERROR;
+        return FALSE;
     }
-
 }
 
 int overwriteFILE(const char nomeArquivoOriginal[], const char nomeArquivoTemp[])
@@ -362,7 +367,7 @@ void alterarIND(ind * pessoa)
         printf("\n\nInsira o nome: "); fgets(nome, NOMETAM, stdin);
         nome[strcspn(nome, "\n")] = '\0';
 
-        if ((retorno = alterarDados(nome)) == FALSE)
+        if ((retorno = alterarFILE(nome)) == FALSE)
         {
             puts("Não foi possível encontrar o individuo.");
         }
@@ -415,7 +420,7 @@ void buscarIND()
     printf("\n\nInsira o nome: "); fgets(nome, NOMETAM, stdin);
     nome[strcspn(nome, "\n")] = '\0';
 
-    if(buscarDados(nome))
+    if(buscarFILE(nome))
     {
         return;
     }
