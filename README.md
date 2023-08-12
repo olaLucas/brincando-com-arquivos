@@ -32,7 +32,7 @@ Estas possuem a responsabilidade de receber os dados do usuário (para cadastro,
 
 ## FILE Functions
 
-Estas tem como objetivo acessar diretamente o arquivo para realizar o registro, leituras, buscas e a exclusão dos indivíduos.
+Estas tem como objetivo acessar diretamente o arquivo para realizar o registros, leituras, buscas e a exclusão dos indivíduos.
 
 - **`void initFILE();`**
     - Verifica se o arquivo já existe. Se não, o cria e exibe uma mensagem com o resultado da operação (sucesso, ou falha).
@@ -62,4 +62,4 @@ Estas tem como objetivo acessar diretamente o arquivo para realizar o registro, 
 
 # Conclusão
 
-No geral, foi um projeto bom (na minha visão). Aprendi o básico de como lidar com arquivos em C, futuramente pretendo refazer esse mesmo projeto tabela hash (carregando os registros para RAM ao invés de manipula-los em memória secundária) e em C++ utilizando as bibliotecas da linguagem (talvez até com GUI usando GTK ou Qt 😏).
+No geral, foi um projeto bom (na minha visão). Aprendi o básico de como lidar com arquivos em C, futuramente pretendo refazer esse mesmo projeto usando tabela hash (carregando os registros para RAM ao invés de manipula-los em memória secundária) e em C++ utilizando as bibliotecas da linguagem (talvez até com GUI usando GTK ou Qt 😏).
