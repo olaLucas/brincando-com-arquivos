@@ -6,7 +6,8 @@
 #define READMODE "r"
 #define WRITEMODE "w"
 #define APPENDMODE "a"
-#define NOMEARQ "arquivo.txt"
+#define APPEND_READ "a+"
+#define NOMEARQ "arquivoTXT.txt"
 #define NOMETEMPLATE "NOME: "
 #define IDADETEMPLATE "IDADE: "
 #define GENEROTEMPLATE "GÊNERO: "
@@ -22,7 +23,7 @@ typedef struct individuo {
 } ind;
 
 ind initIND();
-void initFILE();
+FILE * initFILE();
 void exibirDados();
 void excluirDados();
 void inserirDados();
@@ -48,33 +49,30 @@ ind initIND() {
     cleanBuffer();
     
     ind temp;
-    printf("NOME: "); fgets(temp.nome, NOMETAM, stdin);
-    printf("\nIDADE: "); scanf("%d", &temp.idade);
+    printf(NOMETEMPLATE); fgets(temp.nome, NOMETAM, stdin);
+    printf(IDADETEMPLATE); scanf("%d", &temp.idade);
 
     cleanBuffer();
 
-    printf("\nGênero: "); fgets(temp.genero, GENEROTAM, stdin);
+    printf(GENEROTEMPLATE); fgets(temp.genero, GENEROTAM, stdin);
     return temp;
-}
-
-void exitFILE(FILE ** arquivoREAD, FILE ** arquivoWRITE, FILE ** arquivoAPPEND) {
-
-    fclose(*arquivoREAD);
-    fclose(*arquivoWRITE);
-    fclose(*arquivoAPPEND);
 }
 
 int menuInitFILE() {
     int seletor = 0;
 
     while (TRUE) {
+
         puts("Deseja criar um novo arquivo? "); puts("1. Sim"); puts("2. Não");
         printf("\n >>> ");
         scanf("%d", &seletor);
 
         if (seletor == 1 || seletor == 2) {
+
             break;
+
         } else {
+            
             puts("Opção inválida, tente novamente.");
             pause();
         }
@@ -83,10 +81,9 @@ int menuInitFILE() {
     return seletor;
 }
 
-void initFILE(FILE ** arquivoREAD, FILE ** arquivoWRITE, FILE ** arquivoAPPEND) {
+FILE * initFILE() {
     
-    FILE * temp;
-    if ((temp = fopen(NOMEARQ, READMODE)) == NULL) {
+    if ((fopen(ENDERECOARQ, READMODE)) == NULL) {
 
         puts("Não foi possivel acessar o arquivo txt (inexistente, corrompido ou nome incorreto). \n");
 
@@ -98,15 +95,24 @@ void initFILE(FILE ** arquivoREAD, FILE ** arquivoWRITE, FILE ** arquivoAPPEND) 
         }
     }
 
-    *arquivoWRITE = fopen(NOMEARQ, WRITEMODE);
-    *arquivoAPPEND = fopen(NOMEARQ, APPENDMODE);
-    *arquivoREAD = fopen(NOMEARQ, READMODE);
+    return fopen(ENDERECOARQ, APPEND_READ);
+}
+
+void exitFILE(FILE * arquivo) {
+
+    puts("Fechando arquivo... ");
+    fclose(arquivo);
+    
+    puts("Encerrando programa...");
+    exit(0);
 }
 
 void inserirDados(FILE * arquivo) {
     
     ind temp = initIND();
+
     if (temp.idade == -1) {
+
         return;
 
     } else {
@@ -126,10 +132,16 @@ void exibirDados(FILE * arquivo) {
     } else {
 
         char c = 0;
-        while (c != EOF) {
+        while (TRUE) {
 
-            c = fgetc(arquivo);
-            printf("%c", c);
+            if ((c = fgetc(arquivo)) != EOF) {
+                
+                printf("%c", c);
+            
+            } else {
+
+                break;
+            }
         }
     }
 
@@ -140,13 +152,7 @@ void excluirDados(FILE * arquivo) {
     puts("puts");
 }
 
-void menu() {
-
-    FILE * arquivoREAD;
-    FILE * arquivoWRITE;
-    FILE * arquivoAPPEND;
-
-    initFILE(&arquivoREAD, &arquivoWRITE, &arquivoAPPEND);
+void menu(FILE * arquivo) {
 
     int seletor = -1;
     while (seletor != 0) {
@@ -166,20 +172,19 @@ void menu() {
         switch (seletor) {
         
             case 0:
-                exitFILE(&arquivoREAD, &arquivoWRITE, &arquivoAPPEND);
-                exit(0);
+                exitFILE(arquivo);
                 break;
             
             case 1:
-                inserirDados(arquivoAPPEND);
+                inserirDados(arquivo);
                 break;
 
             case 2:
-                exibirDados(arquivoREAD);
+                exibirDados(arquivo);
                 break;
 
             case 3:
-                excluirDados(arquivoWRITE);
+                excluirDados(arquivo);
                 break;
             
             default:
@@ -193,7 +198,8 @@ void menu() {
 
 int main(void) {
     
-    menu();
+    FILE * arquivo = initFILE();
+    menu(arquivo);
 
     return 0;
 }
