@@ -32,7 +32,7 @@ Estas possuem a responsabilidade de receber os dados do usuário (para cadastro,
 
 ## FILE Functions
 
-Estas tem como objetivo acessar diretamente o arquivo para realizar o registro, leituras, buscas e a exclusão dos indivíduos.
+Estas tem como objetivo acessar diretamente o arquivo para realizar o registros, leituras, buscas e a exclusão dos indivíduos.
 
 - **`void initFILE();`**
     - Verifica se o arquivo já existe. Se não, o cria e exibe uma mensagem com o resultado da operação (sucesso, ou falha).
