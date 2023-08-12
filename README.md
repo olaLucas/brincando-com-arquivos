@@ -41,7 +41,7 @@ Estas tem como objetivo acessar diretamente o arquivo para realizar o registro, 
 - **`void exibirFILE();`**
     - Percorre o arquivo em busca de registros;
     - Envia os registros encontrados para `exibirIND()`;
-- **`int buscarDados(const char nome[]);`**
+- **`int buscarFILE(const char nome[]);`**
     - Percorre o arquivo em busca de um indivíduo com o nome informado no parâmetro;
     - Envia o registro para `exibirIND()`;
     - Ao final retorna como `int`o resultado das operações;
@@ -50,7 +50,7 @@ Estas tem como objetivo acessar diretamente o arquivo para realizar o registro, 
     - Cria um arquivo temporário, aonde armazena os registros do arquivo principal com exceção do indivíduo selecionado para exclusão;
     - Verifica se o indivíduo se encontra registrado, se sim, fecha os arquivos e chama a função `overwriteFILE()`;
     - Ao final retorna como `int`o resultado das operações;
-- **`int alterarDados(const char nomeAlterar[]);`:**
+- **`int alterarFILE(const char nomeAlterar[]);`:**
     - Percorre o arquivo em busca de um indivíduo com o nome informado no parâmetro;
     - Cria um arquivo temporário aonde armazena os dados do arquivo principal;
     - Ao encontrar o indivíduo alvo, chama a função `alterarIND()` passando o endereço da `struct indivíduo temp`;
