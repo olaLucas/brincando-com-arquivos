@@ -1,7 +1,5 @@
 # brincando-com-arquivos
 
-# brincando-com-arquivos
-
 # Introdução
 
 Este repositório se resume a um simples CRUD (create, recovery, update and delete) de uma `struct` de indivíduos com nome, idade e altura que são salvos em um arquivo binário utilizando a biblioteca padrão `<stdio.h>` da linguagem C.
