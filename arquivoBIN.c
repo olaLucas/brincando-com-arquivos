@@ -27,25 +27,27 @@ typedef struct individuo
     float altura;
 } ind;
 
+// file functions
+void initFILE();
+void inserirFILE(ind temp);
+void exibirFILE();
+int buscarDados(const char nome[]);
+int excluirFILE(const char nomeExcluir[]);
+int overwriteFILE(const char nomeArquivoOriginal[], const char nomeArquivoTemp[]);
+
+// ind functions
+ind initIND();
+void exibirIndividuoIND(ind temp);
+void excluirIND();
+void alterarIND(ind * pessoa);
+void buscarIND();
+int menuAlterarIND();
+
 // main functions
 void menu();
 void exitMENU();
 void cleanBuffer();
 void pause();
-
-// ind functions
-ind initIND();
-void exibirIndividuo(ind temp);
-void excluirIND();
-void alterarIND();
-int menuAlterar();
-
-// file functions
-void initFILE();
-void inserirDados(ind temp);
-void exibirDados();
-int excluirDados(const char nomeExcluir[]);
-int overwrite(const char nomeArquivoOriginal[], const char nomeArquivoTemp[]);
 
 
 // file
@@ -68,14 +70,9 @@ void initFILE()
 
         return;
     }
-    else
-    {
-        puts("Arquivo já existente.");
-        return;
-    }
 }
 
-void inserirDados(ind temp) 
+void inserirFILE(ind temp) 
 {
     FILE * arquivo;
     if((arquivo = fopen(FILENAME, APPENDMODE)) == NULL)
@@ -89,8 +86,9 @@ void inserirDados(ind temp)
     }
 }
 
-void exibirDados() 
+void exibirFILE() 
 {
+    unsigned int counter = 0;
     ind temp;
     size_t retorno = 0;
     FILE * arquivo;
@@ -102,12 +100,21 @@ void exibirDados()
     else
     {
         while ((retorno = fread(&temp, sizeof(temp), 1, arquivo)) != FALSE) 
-        {
-            exibirIndividuo(temp);
-            printf("\n");
+        {   
+            counter++;
+            exibirIndividuoIND(temp);
+            puts("\n");
         }
 
-        pause();
+        if (counter == 0)
+        {
+            puts("Arquivo vazio.");
+        }
+        else
+        {
+            pause();
+        }
+        
         fclose(arquivo);
     }
 }
@@ -128,9 +135,10 @@ int buscarDados(const char nome[])
     {
         if(strcmp(temp.nome, nome) == 0)
         {
-            puts("Encontrado.");
-            exibirIndividuo(temp);
-            pause();
+            puts("\nEncontrado. \n");
+            exibirIndividuoIND(temp);
+        
+            puts("\nPressione enter para continuar..."); pause();
             return TRUE;
         }
         else
@@ -142,13 +150,13 @@ int buscarDados(const char nome[])
     return FALSE;
 }
 
-int excluirDados(const char nomeExcluir[])
+int excluirFILE(const char nomeExcluir[])
 {
+    ind temp;
     FILE * arquivoNovo;
     FILE * arquivoAntigo;
-    ind temp;
+    size_t retornoFunctions = 0;
     int found = FALSE;
-    size_t retorno = 0;
     int retornoString;
 
     if((arquivoNovo = fopen(EXCLUIRFILENAME, WRITEMODE)) == NULL)
@@ -163,29 +171,44 @@ int excluirDados(const char nomeExcluir[])
         return ERROR;
     }
 
-    while ((retorno = fread(&temp, sizeof(temp), 1, arquivoAntigo)) != 0)
+    while ((retornoFunctions = fread(&temp, sizeof(temp), 1, arquivoAntigo)) != 0)
     {
         if((retornoString = strcmp(temp.nome, nomeExcluir)) == 0)  // "apagando" o individuo alvo
         {
             found = TRUE;
-            puts("Não registrando individuo alvo...");
         }
         else if(retornoString != 0) // "salvando" os demais individuos
         {
-            puts("Registrando...");
             fwrite(&temp, sizeof(struct individuo), 1, arquivoNovo);
         }
     }
 
-    //overwritting
-    return overwrite(FILENAME, EXCLUIRFILENAME);
+    // checando o que retornar
+    if (found == TRUE)
+    {   
+        // overwritting
+        retornoFunctions = overwriteFILE(FILENAME, EXCLUIRFILENAME);
+
+        if(retornoFunctions == FALSE)
+        {
+            return TRUE;
+        }
+        else
+        {
+            return ERROR;
+        }
+    }
+    else
+    {
+        return FALSE;
+    }
 }
 
 int alterarDados(const char nomeAlterar[])
 {
     FILE * arquivoTemp;
     FILE * arquivoOriginal;
-    size_t retorno = 0;
+    size_t retornoFunctions = 0;
     int found = FALSE;
     int retornoString;
     ind temp;
@@ -202,17 +225,17 @@ int alterarDados(const char nomeAlterar[])
         return ERROR;
     }
 
-    while ((retorno = fread(&temp, sizeof(temp), 1, arquivoOriginal)) != 0)
+    while ((retornoFunctions = fread(&temp, sizeof(temp), 1, arquivoOriginal)) != 0)
     {
         if((retornoString = strcmp(temp.nome, nomeAlterar)) == 0)  // selecionando o individuo alvo para alteração
         {
-            puts("Alterando...");
+            found = TRUE;
             alterarIND(&temp);
             fwrite(&temp, sizeof(temp), 1, arquivoTemp);
+            
         }
         else if(retornoString != 0) // copiando os demais individuos
         {
-            puts("Copiando...");
             fwrite(&temp, sizeof(temp), 1, arquivoTemp);
         }
     }
@@ -220,12 +243,27 @@ int alterarDados(const char nomeAlterar[])
     fclose(arquivoTemp);
     fclose(arquivoOriginal);
 
-    return overwrite(FILENAME, ALTERARFILENAME);
+    retornoFunctions = overwriteFILE(FILENAME, ALTERARFILENAME);
+
+    if(found == TRUE && retornoFunctions == FALSE)
+    {
+        return TRUE;
+    }
+    else if (found == FALSE && retornoFunctions == FALSE)
+    {
+        return FALSE;
+    }
+    else
+    {
+        return ERROR;
+    }
+
 }
 
-int overwrite(const char nomeArquivoOriginal[], const char nomeArquivoTemp[])
+int overwriteFILE(const char nomeArquivoOriginal[], const char nomeArquivoTemp[])
 {
-    int retorno;
+    int retornoFunctions;
+    int error = FALSE;
     ind temp;
     FILE * arquivoOriginal;
     FILE * arquivoTemp;
@@ -233,27 +271,30 @@ int overwrite(const char nomeArquivoOriginal[], const char nomeArquivoTemp[])
     if ((arquivoOriginal = fopen(FILENAME, WRITEMODE)) == NULL)
     {
         puts("Não foi possível abrir o arquivo antigo (overwrite).");
-        return ERROR;
+        return (error = TRUE);
     }
 
     if ((arquivoTemp = fopen(nomeArquivoTemp, READMODE)) == NULL)
     {
         puts("Não foi possível abrir o arquivo novo (overwrite).");
-        return ERROR;
+        return (error = TRUE);
     }
 
-    while ((retorno = fread(&temp, sizeof(temp), 1, arquivoTemp)))
+    while ((retornoFunctions = fread(&temp, sizeof(temp), 1, arquivoTemp)))
     {
-        if((retorno = fwrite(&temp, sizeof(temp), 1, arquivoOriginal)) == FALSE) // escrevendo os dados do temp no arquivo antigo
+        if((retornoFunctions = fwrite(&temp, sizeof(temp), 1, arquivoOriginal)) == FALSE) // escrevendo os dados do temp no arquivo antigo
         {
             puts("Ocorreu um erro ao registrar o individuo: \n\n");
-            exibirIndividuo(temp);
+            exibirIndividuoIND(temp);
+            error = TRUE;
         }
     }
 
     fclose(arquivoOriginal);
     fclose(arquivoTemp);
     remove(nomeArquivoTemp);
+
+    return error;
 }
 
 
@@ -275,7 +316,7 @@ ind initIND()
     return temp;
 }
 
-void exibirIndividuo(ind temp)
+void exibirIndividuoIND(ind temp)
 {
     printf("%s%s", NOMETEMPLATE, temp.nome);
     printf("\n%s%d", IDADETEMPLATE, temp.idade);
@@ -292,10 +333,14 @@ void excluirIND()
 
     nome[strcspn(nome, "\n")] = '\0';
 
-    if((retorno = excluirDados(nome)) == ERROR)
+    if((retorno = excluirFILE(nome)) == ERROR)
     {
         puts("Ocorreu um erro ao realizar a operação.");
         pause();
+    }
+    else if(retorno == FALSE)
+    {
+        puts("Individuo não encontrado.");
     }
     else
     {
@@ -306,63 +351,56 @@ void excluirIND()
 
 void alterarIND(ind * pessoa)
 {
-    cleanBuffer();
+    
     
     int retorno;
     char nome[NOMETAM];
     if(pessoa == NULL)
     {
-        printf("Insira o nome: "); fgets(nome, NOMETAM, stdin);
+        cleanBuffer();
 
+        printf("\n\nInsira o nome: "); fgets(nome, NOMETAM, stdin);
         nome[strcspn(nome, "\n")] = '\0';
 
         if ((retorno = alterarDados(nome)) == FALSE)
         {
             puts("Não foi possível encontrar o individuo.");
-            pause();
         }
         else if(retorno == ERROR)
         {
             puts("Ocorreu um erro ao realizar a operação.");
-            pause();
         }
         else
         {
-            puts("Individuo apagado com sucesso.");
-            pause();
+            puts("Informações alteradas com sucesso.");
         }
     }
     else if(pessoa != NULL)
     {
-        exibirIndividuo(*pessoa);
-        retorno = menuAlterar(); 
+        exibirIndividuoIND(*pessoa);
+        retorno = menuAlterarIND(); 
 
         switch (retorno)
         {
         case 1:
             cleanBuffer();
-
             printf("Insira o novo nome: ");
-
             fgets(nome, NOMETAM, stdin);
-            nome[strspn(nome, "\n")] = '\0';
-            strcpy(pessoa->nome, nome);
-
-            return;
+            nome[strcspn(nome, "\n")] = '\0';
+            memcpy(pessoa->nome, nome, sizeof(nome));
             break;
 
         case 2:
+            printf("Insira a nova idade: ");
             scanf("%d", &pessoa->idade);
-            return;
             break;
 
         case 3:
+            printf("Insira a nova altura: ");
             scanf("%f", &pessoa->altura);
-            return;
             break;
         
         default:
-            return;
             break;
         }
     }
@@ -374,7 +412,7 @@ void buscarIND()
     int retorno;
     char nome[NOMETAM];
 
-    printf("Insira o nome: "); fgets(nome, NOMETAM, stdin);
+    printf("\n\nInsira o nome: "); fgets(nome, NOMETAM, stdin);
     nome[strcspn(nome, "\n")] = '\0';
 
     if(buscarDados(nome))
@@ -383,31 +421,12 @@ void buscarIND()
     }
     else
     {
-        puts("Individuo não encontrado.");
+        puts("\nIndividuo não encontrado.");
         return;
     }
 }
 
-// menu
-void cleanBuffer() 
-{
-    int c;
-    while ((c = getchar()) != '\n');
-}
-
-void pause() 
-{
-    cleanBuffer();
-    getchar();
-}
-
-void exitMENU()
-{
-    puts("Encerrando programa.");
-    exit(0);
-}
-
-int menuAlterar()
+int menuAlterarIND()
 {
     int seletor = -1;
     while (TRUE)
@@ -434,21 +453,40 @@ int menuAlterar()
     }
 }
 
+// main
+void cleanBuffer() 
+{
+    int c;
+    while ((c = getchar()) != '\n');
+}
+
+void pause() 
+{
+    cleanBuffer();
+    getchar();
+}
+
+void exitMENU()
+{
+    puts("Encerrando programa.");
+    exit(0);
+}
+
 void menu()
 {
     int seletor = -1;
     while (seletor != 0) 
     {
-        system("clear");
+        //system("clear");
         
-        puts("Selecione uma opção: \n");
+        puts("\nSelecione uma opção: \n");
         puts("0. Sair");
-        puts("1. Inserir dados.");
-        puts("2. Imprimir dados.");
+        puts("1. Inserir individuo.");
+        puts("2. Imprimir individuo.");
         puts("3. Buscar individuo.");
-        puts("4. Alterar dados.");
-        puts("5. Excluir dados.");
-        puts("6. Apagar todos os dados.");
+        puts("4. Alterar individuo.");
+        puts("5. Excluir individuo.");
+        puts("6. Excluir arquivo.");
     
         printf("\n >>> ");
         scanf("%d", &seletor);
@@ -460,11 +498,12 @@ void menu()
                 break;
             
             case 1:
-                inserirDados(initIND());
+                puts("\n");
+                inserirFILE(initIND());
                 break;
 
             case 2:
-                exibirDados();
+                exibirFILE();
                 break;
 
             case 3:
